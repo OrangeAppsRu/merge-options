@@ -39,15 +39,8 @@
     "clone"
   ],
   "devDependencies": {
-    "ava": "^3.11.1",
-    "coveralls": "^3.1.0",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2",
-    "tsd": "^0.13.1",
-    "xo": "^0.33.0"
   },
   "dependencies": {
-    "is-plain-obj": "^2.1.0"
   },
   "xo": {
     "rules": {

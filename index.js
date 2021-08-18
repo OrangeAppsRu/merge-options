@@ -1,25 +1,37 @@
 'use strict';
-const isOptionObject = require('is-plain-obj');
 
-const {hasOwnProperty} = Object.prototype;
-const {propertyIsEnumerable} = Object;
-const defineProperty = (object, name, value) => Object.defineProperty(object, name, {
-	value,
-	writable: true,
-	enumerable: true,
-	configurable: true
-});
+var isOptionObject = function(value) {
+	if (Object.prototype.toString.call(value) !== '[object Object]') {
+		return false;
+	}
 
-const globalThis = this;
-const defaultMergeOptions = {
+	var prototype = Object.getPrototypeOf(value);
+
+	return prototype === null || prototype === Object.prototype;
+};
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propertyIsEnumerable = Object.propertyIsEnumerable;
+
+var defineProperty = function defineProperty(object, name, value) {
+	return Object.defineProperty(object, name, {
+		value: value,
+		writable: true,
+		enumerable: true,
+		configurable: true
+	});
+};
+
+var globalThis = undefined;
+var defaultMergeOptions = {
 	concatArrays: false,
 	ignoreUndefined: false
 };
 
-const getEnumerableOwnPropertyKeys = value => {
-	const keys = [];
+var getEnumerableOwnPropertyKeys = function getEnumerableOwnPropertyKeys(value) {
+	var keys = [];
 
-	for (const key in value) {
+	for (var key in value) {
 		if (hasOwnProperty.call(value, key)) {
 			keys.push(key);
 		}
@@ -27,11 +39,32 @@ const getEnumerableOwnPropertyKeys = value => {
 
 	/* istanbul ignore else  */
 	if (Object.getOwnPropertySymbols) {
-		const symbols = Object.getOwnPropertySymbols(value);
+		var symbols = Object.getOwnPropertySymbols(value);
 
-		for (const symbol of symbols) {
-			if (propertyIsEnumerable.call(value, symbol)) {
-				keys.push(symbol);
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
+
+		try {
+			for (var _iterator = symbols[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var symbol = _step.value;
+
+				if (propertyIsEnumerable.call(value, symbol)) {
+					keys.push(symbol);
+				}
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator.return) {
+					_iterator.return();
+				}
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
+				}
 			}
 		}
 	}
@@ -52,9 +85,9 @@ function clone(value) {
 }
 
 function cloneArray(array) {
-	const result = array.slice(0, 0);
+	var result = array.slice(0, 0);
 
-	getEnumerableOwnPropertyKeys(array).forEach(key => {
+	getEnumerableOwnPropertyKeys(array).forEach(function (key) {
 		defineProperty(result, key, clone(array[key]));
 	});
 
@@ -62,9 +95,9 @@ function cloneArray(array) {
 }
 
 function cloneOptionObject(object) {
-	const result = Object.getPrototypeOf(object) === null ? Object.create(null) : {};
+	var result = Object.getPrototypeOf(object) === null ? Object.create(null) : {};
 
-	getEnumerableOwnPropertyKeys(object).forEach(key => {
+	getEnumerableOwnPropertyKeys(object).forEach(function (key) {
 		defineProperty(result, key, clone(object[key]));
 	});
 
@@ -78,8 +111,8 @@ function cloneOptionObject(object) {
  * @param {Object} config Config Object
  * @returns {*} cloned Object
  */
-const mergeKeys = (merged, source, keys, config) => {
-	keys.forEach(key => {
+var mergeKeys = function mergeKeys(merged, source, keys, config) {
+	keys.forEach(function (key) {
 		if (typeof source[key] === 'undefined' && config.ignoreUndefined) {
 			return;
 		}
@@ -103,15 +136,15 @@ const mergeKeys = (merged, source, keys, config) => {
  *
  * see [Array.prototype.concat ( ...arguments )](http://www.ecma-international.org/ecma-262/6.0/#sec-array.prototype.concat)
  */
-const concatArrays = (merged, source, config) => {
-	let result = merged.slice(0, 0);
-	let resultIndex = 0;
+var concatArrays = function concatArrays(merged, source, config) {
+	var result = merged.slice(0, 0);
+	var resultIndex = 0;
 
-	[merged, source].forEach(array => {
-		const indices = [];
+	[merged, source].forEach(function (array) {
+		var indices = [];
 
 		// `result.concat(array)` with cloning
-		for (let k = 0; k < array.length; k++) {
+		for (var k = 0; k < array.length; k++) {
 			if (!hasOwnProperty.call(array, k)) {
 				continue;
 			}
@@ -127,7 +160,9 @@ const concatArrays = (merged, source, config) => {
 		}
 
 		// Merge non-index keys
-		result = mergeKeys(result, array, getEnumerableOwnPropertyKeys(array).filter(key => !indices.includes(key)), config);
+		result = mergeKeys(result, array, getEnumerableOwnPropertyKeys(array).filter(function (key) {
+			return !indices.includes(key);
+		}), config);
 	});
 
 	return result;
@@ -151,20 +186,45 @@ function merge(merged, source, config) {
 	return mergeKeys(merged, source, getEnumerableOwnPropertyKeys(source), config);
 }
 
-module.exports = function (...options) {
-	const config = merge(clone(defaultMergeOptions), (this !== globalThis && this) || {}, defaultMergeOptions);
-	let merged = {_: {}};
+module.exports = function () {
+	var config = merge(clone(defaultMergeOptions), this !== globalThis && this || {}, defaultMergeOptions);
+	var merged = { _: {} };
 
-	for (const option of options) {
-		if (option === undefined) {
-			continue;
+	for (var _len = arguments.length, options = Array(_len), _key = 0; _key < _len; _key++) {
+		options[_key] = arguments[_key];
+	}
+
+	var _iteratorNormalCompletion2 = true;
+	var _didIteratorError2 = false;
+	var _iteratorError2 = undefined;
+
+	try {
+		for (var _iterator2 = options[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+			var option = _step2.value;
+
+			if (option === undefined) {
+				continue;
+			}
+
+			if (!isOptionObject(option)) {
+				throw new TypeError('`' + option + '` is not an Option Object');
+			}
+
+			merged = merge(merged, { _: option }, config);
 		}
-
-		if (!isOptionObject(option)) {
-			throw new TypeError('`' + option + '` is not an Option Object');
+	} catch (err) {
+		_didIteratorError2 = true;
+		_iteratorError2 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion2 && _iterator2.return) {
+				_iterator2.return();
+			}
+		} finally {
+			if (_didIteratorError2) {
+				throw _iteratorError2;
+			}
 		}
-
-		merged = merge(merged, {_: option}, config);
 	}
 
 	return merged._;
